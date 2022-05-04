@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset='utf-8'>
+	<meta http-equiv='X-UA-Compatible' content='IE=edge'>
+	<title>Page Title</title>
+	<meta name='viewport' content='width=device-width, initial-scale=1'>
+	<link rel='stylesheet' type='text/css' media='screen' href='CSSGame.css'>
+	<script type="text/javascript" src="JSGame.js"></script>
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Audiowide">
+</head>
+
+<BODY>
+	<h1>XO GAME</h1>
+	<div class="names">
+		Player number 1, enter your nickname and Select your favorite color: <input type="text" id="name1"><input type="color" id="color1">
+		<br>
+		Player number 2, enter your nickname and Select your favorite color: <input type="text" id="name2"><input type="color" id="color2">
+		<br>
+		<button onclick="names()">Submit</button>
+	</div>
+
+
+
+
+
+
+
+
+	<div id="writen color1"></div>
+	<div id="writen color2"></div>
+	<p id="enter name1"></p>
+	<p id="enter name2"></p>
+
+	<input id = "btnRestart" type = "button" onclick="restart()" value="restart">
+
+	Rows number
+	<select id="selRowNum">
+		<option value="4"></option>
+		<option value="5"></option>
+		<option value="6"></option>
+		<option value="7"></option>
+	</select>
+	Columns number
+	<select id="selColNum">
+		<option value="4"></option>
+		<option value="5"></option>
+		<option value="6"></option>
+		<option value="7"></option>
+	</select>
+	<input type="button" onclick="buildBoard()" , value="Build Board">
+	<div id="turnNow"></div>
+	<div id="board">
+		<p id="greeting"></p>
+		<div id="turnNow"></div>
+
+	</div>
+</BODY>
+
+</HTML>
