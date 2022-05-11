@@ -4,6 +4,7 @@ var player2;
 var color1;
 var color2;
 var colorWinArr = new Array();
+var colorWin = "gold";
 var TimeToChangeTurn = 10000 + 1000;
 var player = "X";
 var winX = 0;
@@ -42,7 +43,7 @@ function buildBoard() {
 			cell.rowNow = rowNum;
 			cell.colNow = colNum;
 			row.appendChild(cell);
-			cell.innerHTML = rowNum + "," + colNum;
+			//cell.innerHTML = rowNum + "," + colNum;
 			arr[rowNum][colNum] = undefined;	
 			cell.onclick = function () { dosomething() };
 		}
@@ -122,21 +123,22 @@ function rowWin(rowNumber, colNumber, playerName) {
 
 		for (i = colNumber + 1; i <= rows && !winner;i++) {
 			if (arr[rowNumber][colNumber] == arr[rowNumber][i]) {
-				document.getElementById("myTable").rows[rowNumber].cells[colNumber].style.backgroundColor = "blue";
-				document.getElementById("myTable").rows[rowNumber].cells[i].style.backgroundColor = "blue";
+				
+				document.getElementById("myTable").rows[rowNumber].cells[colNumber].style.backgroundColor = colorWin;
+				document.getElementById("myTable").rows[rowNumber].cells[i].style.backgroundColor = colorWin;
 			}
 			else break;
 		}
 		for (i = colNumber - 1; i >= 0 && !winner ;i--){
 			if (arr[rowNumber][colNumber] == arr[rowNumber][i]) {
-				document.getElementById("myTable").rows[rowNumber].cells[colNumber].style.backgroundColor = "blue";
-				document.getElementById("myTable").rows[rowNumber].cells[i].style.backgroundColor = "blue";
+				document.getElementById("myTable").rows[rowNumber].cells[colNumber].style.backgroundColor = colorWin;
+				document.getElementById("myTable").rows[rowNumber].cells[i].style.backgroundColor = colorWin;
 			}
 			else break;
 		}
 		winner = true;
 		countWin(playerName);
-		alert(playerName + " is the winner(ROW)");
+
 	}
 }
 
@@ -167,22 +169,21 @@ function colWin(rowNumber, colNumber, playerName) {
 	if (colCounter >= 3) {
 		for (i = rowNumber + 1 ; i < arr[0].length && !winner ; i++) {
 			if (arr[rowNumber][colNumber] == arr[i][colNumber]) {
-				document.getElementById("myTable").rows[rowNumber].cells[colNumber].style.backgroundColor = "blue";
-				document.getElementById("myTable").rows[i].cells[colNumber].style.backgroundColor = "blue";
+				document.getElementById("myTable").rows[rowNumber].cells[colNumber].style.backgroundColor = colorWin;
+				document.getElementById("myTable").rows[i].cells[colNumber].style.backgroundColor = colorWin;
 			}
 			else break;
 		}
 		for (i = rowNumber - 1; i >= 0 && !winner ;i--){
 			if (arr[rowNumber][colNumber] == arr[i][colNumber]) {
-				document.getElementById("myTable").rows[rowNumber].cells[colNumber].style.backgroundColor = "blue";
-				document.getElementById("myTable").rows[i].cells[colNumber].style.backgroundColor = "blue";
+				document.getElementById("myTable").rows[rowNumber].cells[colNumber].style.backgroundColor = colorWin;
+				document.getElementById("myTable").rows[i].cells[colNumber].style.backgroundColor = colorWin;
 			}
 			else break;
 		}
 		winner = true;
 		countWin(playerName);
 		
-		alert(playerName + " is the winner(COL)");
 	}
 
 }
@@ -231,8 +232,8 @@ var z = colNumber - 1;
 		for (x = rowNumber + 1; x < arr[0].length ; x++){
 			for (y ; y < arr.length ; y++){
 				if (arr[rowNumber][colNumber] == arr[x][y]){
-					document.getElementById("myTable").rows[rowNumber].cells[colNumber].style.backgroundColor = "blue";
-					document.getElementById("myTable").rows[x].cells[y].style.backgroundColor = "blue";
+					document.getElementById("myTable").rows[rowNumber].cells[colNumber].style.backgroundColor = colorWin;
+					document.getElementById("myTable").rows[x].cells[y].style.backgroundColor = colorWin;
 					y++;
 				}
 				else y++;
@@ -245,8 +246,8 @@ var z = colNumber - 1;
 			for (x = rowNumber - 1; x >= 0  ; x--){
 				for (z ; z >= 0 ; z--){
 					if (arr[rowNumber][colNumber] == arr[x][z]){
-						document.getElementById("myTable").rows[rowNumber].cells[colNumber].style.backgroundColor = "blue";
-						document.getElementById("myTable").rows[x].cells[z].style.backgroundColor = "blue";
+						document.getElementById("myTable").rows[rowNumber].cells[colNumber].style.backgroundColor = colorWin;
+						document.getElementById("myTable").rows[x].cells[z].style.backgroundColor = colorWin;
 						z--;
 					}
 		else z--;
@@ -255,8 +256,7 @@ var z = colNumber - 1;
 }
 		winner = true;
 		countWin(playerName);
-		alert(playerName + " is the winnerׂ(diagnol to right down and left up)");
-	
+		
 
 	}
 }
@@ -302,8 +302,8 @@ function diagnolLeftDownRightUpTest(rowNumber, colNumber, playerName){
 		for (x = rowNumber + 1; x < arr.length ; x++){
 			for (y ; y >= 0 ; y--){
 				if (arr[rowNumber][colNumber] == arr[x][y]){
-					document.getElementById("myTable").rows[rowNumber].cells[colNumber].style.backgroundColor = "blue";
-					document.getElementById("myTable").rows[x].cells[y].style.backgroundColor = "blue";
+					document.getElementById("myTable").rows[rowNumber].cells[colNumber].style.backgroundColor = colorWin;
+					document.getElementById("myTable").rows[x].cells[y].style.backgroundColor = colorWin;
 					y--;
 				}
 				else y--;
@@ -316,8 +316,8 @@ function diagnolLeftDownRightUpTest(rowNumber, colNumber, playerName){
 		for (x = rowNumber - 1; x >= 0 ; x--){
 			for (z; z < arr.length ; z++){
 				if (arr[rowNumber][colNumber] == arr[x][z]){
-					document.getElementById("myTable").rows[rowNumber].cells[colNumber].style.backgroundColor = "blue";
-					document.getElementById("myTable").rows[x].cells[z].style.backgroundColor = "blue";
+					document.getElementById("myTable").rows[rowNumber].cells[colNumber].style.backgroundColor = colorWin;
+					document.getElementById("myTable").rows[x].cells[z].style.backgroundColor = colorWin;
 					z++;
 				}
 				else z++;
@@ -328,13 +328,15 @@ function diagnolLeftDownRightUpTest(rowNumber, colNumber, playerName){
 		}
 		winner = true;
 		countWin(playerName);
-		alert(playerName + " is the winner (diagnol to left down and right up)");
+	
 	}
 }
 
 
 function restart() {
 	countClick = 0;
+	winO = 0;
+	winX = 0;
 	for (var q = 0; q < arr.length; q++) {
 		for (var x = 0; x < arr[0].length; x++) {
 			arr[q][x] = "";
@@ -429,17 +431,24 @@ function names() {
 	document.getElementById("color1").innerHTML = color1;
 	color2 = document.getElementById("color2").value;
 	document.getElementById("color2").innerHTML = color2;
+
+	if(color1 || color2 == "gold"){
+		colorWin = "silver";
+	}
 }
 
 function countWin(currentPlayer){
 	
 	if(currentPlayer == player1){
 		winX++;
+		alert(winX + " points for " + player1);
 	}
 
 	else{
 		winO++;
+		alert(winO + " points for " + player2);
 	}
+
 }
 
 
@@ -449,14 +458,17 @@ function results(winX, winO){
 
 	if(winX > winO){
 		alert(player1 + " is the winner! " + player1 + ": " + winX + " " + player2 + ": " + winO);
+		break;
 	}
 
 	else if(winX < winO){
 		alert(player2 + " is the winner! " + player2 + ": " + winO + " " + player1 + ": " + winO);
+		break;
 	}
 
 	else if(winX == winO){
 		alert("draw! " + player1 + ": " + winX + " " + player2 + ": " + winO);
+		break
 	}
 }
 
