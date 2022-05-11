@@ -3,26 +3,21 @@ var player1;
 var player2;
 var color1;
 var color2;
-var firstArray = new Array();
+var colorWinArr = new Array();
 var TimeToChangeTurn = 10000 + 1000;
 var player = "X";
-var winX;
-var winO;
-
-
-
+var winX = 0;
+var winO = 0;
+var countClick = 0;
+var sizeBoard;
+var winnerName;
 
 
 function buildBoard() {
 	var rows = document.getElementById("selRowNum").value;
 	var cols = document.getElementById("selColNum").value;
-
-	var board = document.getElementById("board");
-	arr = new Array(selRowNum.value);
-	for (var i = 0; i < selRowNum.value; i++) {
-		arr[i] = new Array(selRowNum.value);
-	}
-
+    var board = document.getElementById("board");
+	sizeBoard = rows * cols;
 	//clear board
 	if (board.hasChildNodes()) {
 		board.removeChild(board.firstChild);
@@ -34,468 +29,436 @@ function buildBoard() {
 	//add rows and columns
 	var rowNum;
 	var colNum;
-	//document.getElementById("turnNow").innerHTML = player1 + " it's your turn now!"
+	
+
+	arr = new Array();
 	for (rowNum = 0; rowNum < rows; rowNum++) {
-		var row =   document.createElement("tr");
+		var row = document.createElement("tr");
 		table.appendChild(row);
+		arr[rowNum] = new Array();
+		
 		for (colNum = 0; colNum < cols; colNum++) {
 			var cell = document.createElement("td");
-			cell.rowNow = rowNum;	
+			cell.rowNow = rowNum;
 			cell.colNow = colNum;
 			row.appendChild(cell);
-			//cell.innerHTML = rowNum + "," + colNum;
-
+			cell.innerHTML = rowNum + "," + colNum;
+			arr[rowNum][colNum] = undefined;	
 			cell.onclick = function () { dosomething() };
-			
 		}
 	}
-	    TimeToChangeTurn = 10000;
-            Timer();
-	
+
+
+	//array for paint win color cells
+	for (var i = 0; i < rowNum; i++) {
+		colorWinArr[i] = new Array(colNum);
+	}
+		
+	console.log(arr);
+	console.log(colorWinArr);
+	TimeToChangeTurn = 10000;
+	Timer();
 }
 
 function dosomething() {
 
 	var cell = event.srcElement;
+	var isXPlayer = currentPlayer == "X";
 
-	if (cell.innerHTML != "O" && cell.innerHTML != "X") {
+	var players = ["X", "O"];
 
-		if (currentPlayer == "X") {
-			cell.innerHTML = currentPlayer;
-			currentPlayer = "O";
-			document.getElementById("myTable").rows[cell.rowNow].cells[cell.colNow].style.backgroundColor = color1;
-			//document.getElementById("turnNow").innerHTML = player2 + " it's your turn now!"
-			
-		}
+	if (cell.innerHTML != players[1] && cell.innerHTML != players[0]) {
+		cell.innerHTML = currentPlayer;
 
-		else {
-			cell.innerHTML = currentPlayer;
-			currentPlayer = "X";
-			console.log(color2);
-			document.getElementById("myTable").rows[cell.rowNow].cells[cell.colNow].style.backgroundColor = color2;
-			//document.getElementById("turnNow").innerHTML = player1 + " it's your turn now!";
-			
-		}
-		
+		currentPlayer = isXPlayer ? players[1] : players[0];
+		var currentColor = isXPlayer ? color1 : color2
 
-		
+		document.getElementById("myTable").rows[cell.rowNow].cells[cell.colNow].style.backgroundColor = currentColor;
 	}
+
 	TimeToChangeTurn = 10000 + 1000;
-	//checkWin(cell.rowNow, cell.colNow);
+    countClick++;
+	arr[cell.rowNow][cell.colNow] = isXPlayer? players[0] : players[1];
+	console.log(arr);
+	rowWin(cell.rowNow, cell.colNow, isXPlayer? player1 : player2);
+	colWin(cell.rowNow, cell.colNow, isXPlayer? player1 : player2);
+	diagnolRightDownLeftUpTest(cell.rowNow, cell.colNow, isXPlayer? player1 : player);
+	diagnolLeftDownRightUpTest(cell.rowNow, cell.colNow, isXPlayer? player1 : player);
+	results(winX, winO);
 	
+
 }
 
-function checkWin(x, y) {
-    checkRow(x, y);
-    checkCol(x, y);
-    checkDiagR(x, y);
-    // checkDiagL(x, y);
+//test the rows
+function rowWin(rowNumber, colNumber, playerName) {
+	var rowCounter = 0;
+	var winner = false;
+	var rows = document.getElementById("selRowNum").value;
+
+	//test row to right
+	for (i = colNumber + 1; i <= rows && !winner;i++) {
+		if (arr[rowNumber][colNumber] == arr[rowNumber][i]) {
+			rowCounter++;
+			colorWinArr[rowNumber][colNumber] = arr[rowNumber][colNumber];
+			colorWinArr[rowNumber][i] = arr[rowNumber][colNumber];
+			
+		}
+		else break;
+	}
+
+
+	//test row to left
+	for (i = colNumber - 1; i >= 0 && !winner ;i--){
+		if (arr[rowNumber][colNumber] == arr[rowNumber][i]) {
+			rowCounter++;
+			colorWinArr[rowNumber][colNumber] = arr[rowNumber][colNumber];
+			colorWinArr[rowNumber][i] = arr[rowNumber][colNumber];
+		}
+		else break;
+	}
+
+
+	if (rowCounter == 3) {
+
+		for (i = colNumber + 1; i <= rows && !winner;i++) {
+			if (arr[rowNumber][colNumber] == arr[rowNumber][i]) {
+				document.getElementById("myTable").rows[rowNumber].cells[colNumber].style.backgroundColor = "blue";
+				document.getElementById("myTable").rows[rowNumber].cells[i].style.backgroundColor = "blue";
+			}
+			else break;
+		}
+		for (i = colNumber - 1; i >= 0 && !winner ;i--){
+			if (arr[rowNumber][colNumber] == arr[rowNumber][i]) {
+				document.getElementById("myTable").rows[rowNumber].cells[colNumber].style.backgroundColor = "blue";
+				document.getElementById("myTable").rows[rowNumber].cells[i].style.backgroundColor = "blue";
+			}
+			else break;
+		}
+		winner = true;
+		countWin(playerName);
+		alert(playerName + " is the winner(ROW)");
+	}
 }
 
-function checkCol(x, y) {
-    var count = 0;
-	player = arr[x][y];
+//test the columns
+function colWin(rowNumber, colNumber, playerName) {
+	var colCounter = 0;
+	var winner = false;
+	var rows = document.getElementById("selRowNum").value;
 
-    for (v = 0; v < (selRowNum.value % 4) + 1; v++)// num rizot
-    {
-        count = 0;
-        for (m = v; m < 4 + v; m++) {
-            if (arr[m][y] == player) {
-                count++;
-                if (x == m)
-                    var check = true;
-                if (count == 1)
-                    var temp = m;
-                else if (count == 4 && check) {
-                    alert("win col " + player);
-                    if (player == "X")
-                        winX++;
-                    else
-                        winO++;
-                    for (i = temp; i <= m; i++) {
-                        document.getElementById("myTable").rows[i].cells[y].style.backgroundColor = "000000";
-                        document.getElementById("myTable").rows[i].cells[y].style.color = "#ffffff";
-                    }
-                }
-            }
-            else
-                m = 4 + v;
-        }
-        /* if (count == 4 && check) {
-             alert("win col " + player);
-             if (player == "X")
-                 winX++;
-             else
-                 winO++;
-         }*/
-    }
+
+	//test the columns down
+	for (i = rowNumber + 1 ; i < arr[0].length && !winner ; i++) {
+		if (arr[rowNumber][colNumber] == arr[i][colNumber]) {
+			colCounter++;
+		}
+		else break;
+	}
+
+
+	//test the columns upwards
+	for (i = rowNumber - 1; i >= 0 && !winner ;i--){
+		if (arr[rowNumber][colNumber] == arr[i][colNumber]) {
+			colCounter++;
+		}
+		else break;
+	}
+
+	if (colCounter >= 3) {
+		for (i = rowNumber + 1 ; i < arr[0].length && !winner ; i++) {
+			if (arr[rowNumber][colNumber] == arr[i][colNumber]) {
+				document.getElementById("myTable").rows[rowNumber].cells[colNumber].style.backgroundColor = "blue";
+				document.getElementById("myTable").rows[i].cells[colNumber].style.backgroundColor = "blue";
+			}
+			else break;
+		}
+		for (i = rowNumber - 1; i >= 0 && !winner ;i--){
+			if (arr[rowNumber][colNumber] == arr[i][colNumber]) {
+				document.getElementById("myTable").rows[rowNumber].cells[colNumber].style.backgroundColor = "blue";
+				document.getElementById("myTable").rows[i].cells[colNumber].style.backgroundColor = "blue";
+			}
+			else break;
+		}
+		winner = true;
+		countWin(playerName);
+		
+		alert(playerName + " is the winner(COL)");
+	}
+
 }
 
-function checkRow(x, y) {
-    var count = 0;
-    player = arr[x][y];
 
-    for (v = 0; v < (selRowNum.value % 4) + 1; v++)
-    {
-        count = 0;
-        for (m = v; m < 4 + v; m++) {
-            if (arr[x][m] == player) {
-                count++;
-                if (x == m)
-                    var check = true;
-                if (count == 1)
-                    var temp = m;
-                else if (count == 4 && check) {
-                    alert("win row " + player);
-                    if (player == "X")
-                        winX++;
-                    else
-					winO++;
-                    for (i = temp; i <= m; i++) {
-                        document.getElementById("myTable").rows[x].cells[i].style.backgroundColor = "000000";
-                        document.getElementById("myTable").rows[x].cells[i].style.color = "#ffffff";
-                    }
-                }
-            }
-            else {
-                m = 4 + v;
-                check = false;      
-            }
-        }
-    }
+//test diagnol to right down and left up
+function diagnolRightDownLeftUpTest(rowNumber, colNumber, playerName){
+	var winner = false;
+	var cell = event.srcElement;
+	var counter = 0;
+var y = colNumber + 1;
+var z = colNumber - 1;
+	
+	//right down
+	for (x = rowNumber + 1; x < arr[0].length ; x++){
+		for (y ; y < arr.length ; y++){
+			if (arr[rowNumber][colNumber] == arr[x][y]){
+				counter++;
+				console.log("right down: counter: " + counter + " rowNumber: " + rowNumber + " colNumber: " + colNumber + " x: " + x + " y: " + y + "" + arr[rowNumber][colNumber] + "" + arr[x][y]);
+				y++;
+			}
+			else y++;
+			break;
+		}
+
+	}
+	
+	//left up
+	for (x = rowNumber - 1; x >= 0  ; x--){
+		for (z ; z >= 0 ; z--){
+			if (arr[rowNumber][colNumber] == arr[x][z]){
+				counter++;
+				console.log("left up counter: " + counter + " rowNumber: " + rowNumber + " colNumber: " + colNumber + " x: " + x + " y: " + y + "" + arr[rowNumber][colNumber] + "" + arr[x][y]);
+				z--;
+			}
+			else z--;
+			break;
+		}
+	}
+
+	if (counter >= 3) {
+
+		
+        //paint right down
+		y = colNumber + 1;
+		for (x = rowNumber + 1; x < arr[0].length ; x++){
+			for (y ; y < arr.length ; y++){
+				if (arr[rowNumber][colNumber] == arr[x][y]){
+					document.getElementById("myTable").rows[rowNumber].cells[colNumber].style.backgroundColor = "blue";
+					document.getElementById("myTable").rows[x].cells[y].style.backgroundColor = "blue";
+					y++;
+				}
+				else y++;
+				break;
+				}	
+			}
+
+            //paint left up
+			z = colNumber - 1;
+			for (x = rowNumber - 1; x >= 0  ; x--){
+				for (z ; z >= 0 ; z--){
+					if (arr[rowNumber][colNumber] == arr[x][z]){
+						document.getElementById("myTable").rows[rowNumber].cells[colNumber].style.backgroundColor = "blue";
+						document.getElementById("myTable").rows[x].cells[z].style.backgroundColor = "blue";
+						z--;
+					}
+		else z--;
+		break;
+	}
+}
+		winner = true;
+		countWin(playerName);
+		alert(playerName + " is the winnerׂ(diagnol to right down and left up)");
+	
+
+	}
 }
 
-function checkDiagR(x, y) {
-    var count = 0;
-    player = arr[x][y];
+//test diagnol to left down and right up
+function diagnolLeftDownRightUpTest(rowNumber, colNumber, playerName){
+	var winner = false;
+	var cell = event.srcElement;
+	var counter = 0;
+	var y = colNumber - 1;
+	var z = colNumber + 1;
 
-    if (x == y) {
-        for (v = 0; v < (selRowNum.value % 4) + 1; v++)// num rizot
-        {
-            count = 0;
-            for (m = v; m < v + 4; m++) {
-                if (arr[m][m] == player) {
-                    count++;
-                }
-                else
-                    m = 4 + v;
-            }
-            if (count == 4) {
-                alert("win diagR up" + player);
-                if (player == "X")
-                    winX++;
-                else
-				winO++;
-            }
-        }
-    }
-    else if (x > y) {
-        for (v = 0; v < 4 - (parseInt(x) - parseInt(y)); v++)// num rizot
-        {
-            count = 0;
-            // for (m = x % 4 - (x - y) + 1; m < v + 4; m++) {
-            for (m = v; m < v + 4; m++) {
-                if (m >= x || m < 0 || m + (parseInt(x) - parseInt(y)) >= selRowNum.value - 1)
-                    break;
-                if (arr[m + (parseInt(x) - parseInt(y))][m] == player) {
-                    count++;
-                }
-                else
-                    m = v + 4;
-            }
-            if (count == 4) {
-                alert("win diagR down" + player);
-                if (player == "X")
-                    winX++;
-                else
-				winO++;
-            }
-        }
-    }
+	//left down
+	for (x = rowNumber + 1; x < arr.length ; x++){
+		for (y ; y >= 0 ; y--){
+			if (arr[rowNumber][colNumber] == arr[x][y]){
+				counter++;
+				console.log("left down counter: " + counter + " rowNumber: " + rowNumber + " colNumber: " + colNumber + " x: " + x + " y: " + y + "" + arr[rowNumber][colNumber] + "" + arr[x][y]);
+				y--;
+			}
+			else y--;
+			break;
+		}
 
-    else {//y>x
-        for (v = 0; v < 4 - (parseInt(y) - parseInt(x)); v++)// num rizot
-        {
-            count = 0;
-            for (m = v; m < v + 4; m++) {
-                if (m >= x || m < 0 || m + (parseInt(x) - parseInt(y)) >= selRowNum.value - 1)
-                    break;
-                if (arr[m][m + (parseInt(y) - parseInt(x))] == player) {
-                    count++;
-                }
-                else
-                    m = v + 4;
-            }
-            if (count == 4) {
-                alert("win vhvj" + player);
-                if (player == "X")
-                    winX++;
-                else
-				winO++;
-            }
-        }
-    }
+	}
+
+	//right up
+	for (x = rowNumber - 1; x >= 0 ; x--){
+		for (z; z < arr.length ; z++){
+			if (arr[rowNumber][colNumber] == arr[x][z]){
+				counter++;
+				console.log("right up counter: " + counter + " rowNumber: " + rowNumber + " colNumber: " + colNumber + " x: " + x + " y: " + y + "" + arr[rowNumber][colNumber] + "" + arr[x][y]);
+				z++;
+			}
+			else z++;
+			break;
+		}
+	}
+
+	if (counter >= 3) {
+        //paint left down
+		y = colNumber - 1;
+		for (x = rowNumber + 1; x < arr.length ; x++){
+			for (y ; y >= 0 ; y--){
+				if (arr[rowNumber][colNumber] == arr[x][y]){
+					document.getElementById("myTable").rows[rowNumber].cells[colNumber].style.backgroundColor = "blue";
+					document.getElementById("myTable").rows[x].cells[y].style.backgroundColor = "blue";
+					y--;
+				}
+				else y--;
+			    break;
+			}
+		}
+
+		//paint right up
+		z = colNumber + 1;
+		for (x = rowNumber - 1; x >= 0 ; x--){
+			for (z; z < arr.length ; z++){
+				if (arr[rowNumber][colNumber] == arr[x][z]){
+					document.getElementById("myTable").rows[rowNumber].cells[colNumber].style.backgroundColor = "blue";
+					document.getElementById("myTable").rows[x].cells[z].style.backgroundColor = "blue";
+					z++;
+				}
+				else z++;
+				break;
+				
+				
+			}
+		}
+		winner = true;
+		countWin(playerName);
+		alert(playerName + " is the winner (diagnol to left down and right up)");
+	}
 }
+
 
 function restart() {
-    sizeGame = 0;
-    leftCells = 0;
-    winX = 0;
-    winY = 0;
-
-    for (var q = 0; q < arr.length; q++) {
-        for (var x = 0; x < arr.length; x++) {
-            arr[q][x] = "";
-            document.getElementById("myTable").rows[q].cells[x].innerHTML = "";
-            document.getElementById("myTable").rows[q].cells[x].style.backgroundColor = 000000;
-            document.getElementById("myTable").rows[q].cells[x].style.color = "#ffffff";
+	countClick = 0;
+	for (var q = 0; q < arr.length; q++) {
+		for (var x = 0; x < arr[0].length; x++) {
+			arr[q][x] = "";
+			document.getElementById("myTable").rows[q].cells[x].innerHTML = "";
+			document.getElementById("myTable").rows[q].cells[x].style.color = "black";
 			document.getElementById('myTable').rows[q].cells[x].style.removeProperty("background-color");
-			
-
-        }
-		ClearInterval(CountDown);
-    }
+		}
+	}
 }
 
-function Timer()
-			{
-				document.getElementById("countdown").style.visibility="visible";
-				CountDown=setInterval(function(){
-					TimeToChangeTurn -= 1000
-					var seconds = Math.floor((TimeToChangeTurn % (1000 * 60)) / 1000);
-						if (currentPlayer == 'X') {
-							document.getElementById("countdown").innerHTML = player1 + "'s Turn <br>"
-								+ seconds + " seconds remaining";
-						}
-						else{
-							document.getElementById("countdown").innerHTML = player2 + "'s Turn <br>"
-								+ seconds + " seconds remaining";
-						}
-
-						if(seconds <=3)
-						{
-							document.getElementById("countdown").style.color ="red";
-						}
-						else
-						document.getElementById("countdown").style.color ="black";
-						if (TimeToChangeTurn == 0) {
-							TimeToChangeTurn = 10000;
-							if(currentPlayer == "X"){
-								currentPlayer = "O";
-								document.getElementById("turnNow").innerHTML = player2 + " it's your turn now!"
-							}
-							else{
-								currentPlayer = "X";
-								document.getElementById("turnNow").innerHTML = player1 + " it's your turn now!"
-							}
-						}
-					}
-					,1000)
-				}
-			
-				function checkWin(x, y) {
-					checkRow(x, y);
-					checkCol(x, y);
-					checkDiagR(x, y);
-					// checkDiagL(x, y);
-				}
-				
-				function checkCol(x, y) {
-					var count = 0;
-					player = arr[x][y];
-				
-					for (v = 0; v < (selRowNum.value % 4) + 1; v++)// num rizot
-					{
-						count = 0;
-						for (m = v; m < 4 + v; m++) {
-							if (arr[m][y] == player) {
-								count++;
-								if (x == m)
-									var check = true;
-								if (count == 1)
-									var temp = m;
-								else if (count == 4 && check) {
-									alert("win col " + player);
-									if (player == "X")
-										winX++;
-									else
-										winO++;
-									for (i = temp; i <= m; i++) {
-										document.getElementById("myTable").rows[i].cells[y].style.backgroundColor = "000000";
-										document.getElementById("myTable").rows[i].cells[y].style.color = "#ffffff";
-									}
-								}
-							}
-							else
-								m = 4 + v;
-						}
-						/* if (count == 4 && check) {
-							 alert("win col " + player);
-							 if (player == "X")
-								 winX++;
-							 else
-								 winO++;
-						 }*/
-					}
-				}
-				
-				function checkRow(x, y) {
-					var count = 0;
-					player = arr[x][y];
-				
-					for (v = 0; v < (selRowNum.value % 4) + 1; v++)// num rizot
-					{
-						count = 0;
-						for (m = v; m < 4 + v; m++) {
-							if (arr[x][m] == player) {
-								count++;
-								if (x == m)
-									var check = true;
-								if (count == 1)
-									var temp = m;
-								else if (count == 4 && check) {
-									alert("win row " + player);
-									if (player == "X")
-										winX++;
-									else
-										winO++;
-									for (i = temp; i <= m; i++) {
-										document.getElementById("myTable").rows[x].cells[i].style.backgroundColor = "000000";
-										document.getElementById("myTable").rows[x].cells[i].style.color = "#ffffff";
-									}
-								}
-							}
-							else {
-								m = 4 + v;
-								check = false;
-								// v= (selRowNum.value % 4) + 1         
-							}
-						}
-					}
-				}
-				
-				function checkDiagR(x, y) {
-					var count = 0;
-					player = arr[x][y];
-				
-					if (x == y) {
-						for (v = 0; v < (selRowNum.value % 4) + 1; v++)// num rizot
-						{
-							count = 0;
-							for (m = v; m < v + 4; m++) {
-								if (arr[m][m] == player) {
-									count++;
-								}
-								else
-									m = 4 + v;
-							}
-							if (count == 4) {
-								alert("win diagR up" + player);
-								if (player == "X")
-									winX++;
-								else
-									winO++;
-							}
-						}
-					}
-					else if (x > y) {
-						for (v = 0; v < 4 - (parseInt(x) - parseInt(y)); v++)// num rizot
-						{
-							count = 0;
-							// for (m = x % 4 - (x - y) + 1; m < v + 4; m++) {
-							for (m = v; m < v + 4; m++) {
-								if (m >= x || m < 0 || m + (parseInt(x) - parseInt(y)) >= selRowNum.value - 1)
-									break;
-								if (arr[m + (parseInt(x) - parseInt(y))][m] == player) {
-									count++;
-								}
-								else
-									m = v + 4;
-							}
-							if (count == 4) {
-								alert("win diagR down" + player);
-								if (player == "X")
-									winX++;
-								else
-									winO++;
-							}
-						}
-					}
-				
-					else {//y>x
-						for (v = 0; v < 4 - (parseInt(y) - parseInt(x)); v++)// num rizot
-						{
-							count = 0;
-							for (m = v; m < v + 4; m++) {
-								if (m >= x || m < 0 || m + (parseInt(x) - parseInt(y)) >= selRowNum.value - 1)
-									break;
-								if (arr[m][m + (parseInt(y) - parseInt(x))] == player) {
-									count++;
-								}
-								else
-									m = v + 4;
-							}
-							if (count == 4) {
-								alert("win " + player);
-								if (player == "X")
-									winX++;
-								else
-									winO++;
-							}
-						}
-					}
-				}
-
-
-	//greeting
-	function greeting() {
-
-		var date = new Date();
-		var HourNow = date.getHours();
-		var timeNow = date.getTime();
-		var a = "";
-		if (HourNow < 12) {
-			a = "Morning";
+function Timer() {
+	document.getElementById("countdown").style.visibility = "visible";
+	CountDown = setInterval(function () {
+		TimeToChangeTurn -= 1000
+		var seconds = Math.floor((TimeToChangeTurn % (1000 * 60)) / 1000);
+		if (currentPlayer == 'X') {
+			document.getElementById("countdown").innerHTML = player1 + "'s Turn <br>"
+				+ seconds + " seconds remaining";
 		}
-		else if (HourNow > 12 || HourNow < 18) {
-			a = "afternoon";
-		}
-		else if (HourNow > 18) {
-			a = "evening";
+		else {
+			document.getElementById("countdown").innerHTML = player2 + "'s Turn <br>"
+				+ seconds + " seconds remaining";
 		}
 
-		document.getElementById("greeting").innerHTML = " good " + a + " " + player1 + " and " + player2 + " it's " + timeNow;
+		if (seconds <= 3) {
+			document.getElementById("countdown").style.color = "red";
+		}
+		else
+			document.getElementById("countdown").style.color = "black";
+		if (TimeToChangeTurn == 0) {
+			TimeToChangeTurn = 10000;
+			if (currentPlayer == "X") {
+				currentPlayer = "O";
+				document.getElementById("turnNow").innerHTML = player2 + " it's your turn now!"
+			}
+			else {
+				currentPlayer = "X";
+				document.getElementById("turnNow").innerHTML = player1 + " it's your turn now!"
+			}
+		}
+	}
+		, 1000)
+}
 
+
+//greeting
+function greeting() {
+
+	var date = new Date();
+	var HourNow = date.getHours();
+	var timeNow = date.getTime();
+	var a = "";
+	if (HourNow < 12) {
+		a = "Morning";
+	}
+	else if (HourNow > 12 || HourNow < 18) {
+		a = "afternoon";
+	}
+	else if (HourNow > 18) {
+		a = "evening";
 	}
 
-	function names() {
-		player1 = document.getElementById("name1").value;
-		player2 = document.getElementById("name2").value;
+	document.getElementById("greeting").innerHTML = " good " + a + " " + player1 + " and " + player2 + " it's " + timeNow;
 
-		var date = new Date();
-		var HourNow = date.getHours();
-		var minutesNow = date.getMinutes();
-		var SecondsNow = date.getSeconds();
-		var ampm = "AM";
-		var dayTime = "";
-		if (HourNow < 12) {
-			dayTime = "Morning";
-		}
-		else if (HourNow > 12 && HourNow < 18) {
-			dayTime = "afternoon";
-			ampm = "PM";
-		}
-		else if (HourNow > 18) {
-			dayTime = "evening";
-			ampm = "PM";
-		}
+}
 
-		document.getElementById("greeting").innerHTML = " Good " + dayTime + " " + player1 + " and " + player2 + " it's " + HourNow + ":" + minutesNow + ":" + SecondsNow + " " + ampm;
 
-		color1 = document.getElementById("color1").value;
-		document.getElementById("color1").innerHTML = color1;
-		color2 = document.getElementById("color2").value;
-		document.getElementById("color2").innerHTML = color2;
+function names() {
+	player1 = document.getElementById("name1").value;
+	player2 = document.getElementById("name2").value;
+
+	var date = new Date();
+	var HourNow = date.getHours();
+	var minutesNow = date.getMinutes();
+	var SecondsNow = date.getSeconds();
+	var ampm = "AM";
+	var dayTime = "";
+	if (HourNow < 12) {
+		dayTime = "Morning";
+	}
+	else if (HourNow > 12 && HourNow < 18) {
+		dayTime = "afternoon";
+		ampm = "PM";
+	}
+	else if (HourNow > 18) {
+		dayTime = "evening";
+		ampm = "PM";
 	}
 
+	document.getElementById("greeting").innerHTML = " Good " + dayTime + " " + player1 + " and " + player2 + " it's " + HourNow + ":" + minutesNow + ":" + SecondsNow + " " + ampm;
+	color1 = document.getElementById("color1").value;
+	document.getElementById("color1").innerHTML = color1;
+	color2 = document.getElementById("color2").value;
+	document.getElementById("color2").innerHTML = color2;
+}
 
+function countWin(currentPlayer){
+	
+	if(currentPlayer == player1){
+		winX++;
+	}
+
+	else{
+		winO++;
+	}
+}
+
+
+function results(winX, winO){
+
+	while(countClick == sizeBoard){
+
+	if(winX > winO){
+		alert(player1 + " is the winner! " + player1 + ": " + winX + " " + player2 + ": " + winO);
+	}
+
+	else if(winX < winO){
+		alert(player2 + " is the winner! " + player2 + ": " + winO + " " + player1 + ": " + winO);
+	}
+
+	else if(winX == winO){
+		alert("draw! " + player1 + ": " + winX + " " + player2 + ": " + winO);
+	}
+}
+
+}
+	
