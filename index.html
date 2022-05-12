@@ -11,7 +11,7 @@
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Audiowide">
 	<link href="http://fonts.cdnfonts.com/css/handgley" rel="stylesheet">
     <script	src= "https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
-	<style> body {font-family: 'Handgley', sans-serif }</style>
+	<style>@import url('http://fonts.cdnfonts.com/css/handgley');</style>
 	<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 	
 </head>
@@ -24,9 +24,11 @@
 		<br>
 		Player number 2 <input type="text" id="name2" style="border-radius: 50px"><input type="color" id="color2" style="border-radius: 100px">
 		<br>
-	
-		<button onclick="names()">Submit</button>
+		<br>
+		<button onclick="names(); showPanel()">Submit</button>
 	</div>
+
+
 	<div class="panel" id="panel">
 	Rows number
 	<select id="selRowNum">
@@ -42,7 +44,7 @@
 		<option value="6">6</option>
 		<option value="7">7</option>
 	</select>
-	<input type="button" onclick="buildBoard()" , value="Start"><input id = "btnRestart" type = "button" onclick="restart()" value="Restart">
+	<input type="button" onclick="buildBoard()" , value="Start"><input id = "btnRestart" type = "button" onclick="restart()" value="Restart" class = "restart">
 	<div id="turnNow"></div>
 	<div id="board" style="font-family: 'Handgley', sans-serif ; margin-left: auto ; margin-right: auto;">
 		<p id="greeting"></p>

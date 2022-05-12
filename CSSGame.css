@@ -37,3 +37,6 @@ td
 		font-family: 'Handgley', sans-serif;
 	  }
 
+	  .panel{
+		display: none;
+	}

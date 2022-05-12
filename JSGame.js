@@ -45,7 +45,7 @@ function buildBoard() {
 			row.appendChild(cell);
 			//cell.innerHTML = rowNum + "," + colNum;
 			arr[rowNum][colNum] = undefined;	
-			cell.onclick = function () { dosomething() };
+			cell.onclick = function () { showTable() };
 		}
 	}
 
@@ -61,7 +61,7 @@ function buildBoard() {
 	Timer();
 }
 
-function dosomething() {
+function showTable() {
 
 	var cell = event.srcElement;
 	var isXPlayer = currentPlayer == "X";
@@ -332,11 +332,20 @@ function diagnolLeftDownRightUpTest(rowNumber, colNumber, playerName){
 	}
 }
 
+function showPanel() {
+	var x = document.getElementById("panel");
+	
+	  x.style.display = "block";
+	
+}
+
 
 function restart() {
 	countClick = 0;
 	winO = 0;
 	winX = 0;
+	var hideTable = document.getElementById("panel");
+	hideTable.style.display = "none";
 	for (var q = 0; q < arr.length; q++) {
 		for (var x = 0; x < arr[0].length; x++) {
 			arr[q][x] = "";
@@ -426,16 +435,20 @@ function names() {
 		ampm = "PM";
 	}
 
+
 	document.getElementById("greeting").innerHTML = " Good " + dayTime + " " + player1 + " and " + player2 + " it's " + HourNow + ":" + minutesNow + ":" + SecondsNow + " " + ampm;
 	color1 = document.getElementById("color1").value;
-	document.getElementById("color1").innerHTML = color1;
+	//document.getElementById("color1").innerHTML = color1;
 	color2 = document.getElementById("color2").value;
-	document.getElementById("color2").innerHTML = color2;
-
+	//document.getElementById("color2").innerHTML = color2;
+	
+	
 	if(color1 || color2 == "gold"){
 		colorWin = "silver";
 	}
 }
+
+
 
 function countWin(currentPlayer){
 	
