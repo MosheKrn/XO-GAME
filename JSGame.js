@@ -446,6 +446,7 @@ function names() {
 	if(color1 || color2 == "gold"){
 		colorWin = "silver";
 	}
+
 }
 
 
