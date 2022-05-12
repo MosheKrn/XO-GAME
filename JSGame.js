@@ -441,12 +441,12 @@ function countWin(currentPlayer){
 	
 	if(currentPlayer == player1){
 		winX++;
-		alert(winX + " points for " + player1);
+		swal(winX + " points for " + player1);
 	}
 
 	else{
 		winO++;
-		alert(winO + " points for " + player2);
+		swal(winO + " points for " + player2);
 	}
 
 }
@@ -457,17 +457,17 @@ function results(winX, winO){
 	while(countClick == sizeBoard){
 
 	if(winX > winO){
-		alert(player1 + " is the winner! " + player1 + ": " + winX + " " + player2 + ": " + winO);
+		swal(player1 + " is the winner!\n "  + player1 + ": " + winX + " points, " + player2 + ": " + winO + " points");
 		break;
 	}
 
 	else if(winX < winO){
-		alert(player2 + " is the winner! " + player2 + ": " + winO + " " + player1 + ": " + winO);
+		swal(player2 + " is the winner!\n " + player2 + ": " + winO + " points, " + player1 + ": " + winO + " points");
 		break;
 	}
 
 	else if(winX == winO){
-		alert("draw! " + player1 + ": " + winX + " " + player2 + ": " + winO);
+		swal("draw!\n " + player1 + ": " + winX + " points\n " + player2 + ": " + winO + " points");
 		break
 	}
 }
